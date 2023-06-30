@@ -1,0 +1,56 @@
+#!/bin/bash
+#
+# helper script to set wireguard things
+
+function showClients() {
+  # launch pivpn > print until the "Disabled" > trim last line > trim 1st two lines > add numbers to the lines
+  sudo pivpn -l | awk '1; /Disabled/{exit}' | head -n -1 | sed '1,2d' | cat -n
+}
+
+function showDisabled() {
+  # launch pivpn > print all lines after "Disabled" > trim first line
+  sudo pivpn -l | awk '/Disabled/{found=1} found' | sed '1d'
+}
+
+function enableClient() {
+  # Enables or disables client
+
+  # Check if the user passed
+  # regrex: positive integers only
+  re='^[0-9]+$'
+  if ! [[ $1 =~ $re ]] ; then
+   echo "error: Not a client integer $1" >&2; exit 1
+  fi
+
+  # Check if second flag is y/n
+  case $2 in
+    "Y")
+      # Enable the client number provided
+      sudo pivpn -on $1 -y
+      ;;
+    "y")
+      # Enable the client number provided
+      sudo pivpn -on $1 -y
+      ;;
+    "N")
+      # Disable the client number provided
+      sudo pivpn -off $1 -y
+      ;;
+    "n")
+      # Disable the client number provided
+      sudo pivpn -off $1 -y
+      ;;
+    *)
+      echo "error: not y/n: $2" >&2; exit 1
+      ;;
+  esac
+}
+
+function showQR() {
+  sudo pivpn $1 -qr
+}
+
+function downloadConf() {
+  #
+  :
+}
